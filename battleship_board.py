@@ -1,16 +1,13 @@
 import math as m
 import numpy as np
-import cupy as cp
+#import cupy as cp
 from random import randint
+import pickle
 
 board = np.zeros((10,10))
 board = board.astype('int')
+
 global control
-global c_3
-global h_c
-global v_c
-
-
 
 def double_ship_check(ship):
     c_3 = 0
@@ -31,6 +28,10 @@ def double_ship_check(ship):
             control = 1
     c_3 = 0
 
+def board_erase():
+    board = np.zeros((10,10))
+    board = board.astype('int')
+
 def ship_v(ship, i, j):
     control = 0
     double_ship_check(ship)
@@ -47,16 +48,33 @@ def ship_v(ship, i, j):
         control = 1
         print("Bad index", i, j, control)
 
-    v_c = v_c + 1
+def ship_h(ship, i, j):
+    control = 0
+    double_ship_check(ship)
+
+    if (i <= 9) and (j <= 9) and (i >= 0) and (j >= 0) and (control == 0):
+        for a in range(ship+1):
+            if board[i, j+a] == 0 and (control == 0):
+                board[i, j+a] = ship
+            else:
+                control = 1
+                print("Bad index", i, j)
+                break
+    else:
+        control = 1
+        print("Bad index", i, j, control)
+def save():
+    np.save('file.npy', board)
+
+def load():
+    board = np.load('file.npy')
 
 def board_creator():
-    global v_c
-    global h_c
-    v_c = 0
-    h_c = 0
-    ship_v(5, 0, 0)
-    ship_v(4, 0, 1)
-
+    ship_v(5, 4, 9)
+    ship_h(4, 0, 1)
+    save()
+    board_erase()
     print(board)
+
 
 board_creator()
